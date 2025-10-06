@@ -37,5 +37,5 @@ To repozytorium zawiera mój kod, eksperymenty i ćwiczenia powstające w trakci
 - **README.md** – ten plik, opisujący misję  
 
 ### 🦉 Moje Motto
-"Pracuj mądrze, nie ciężko." 
+"Pracuj mądrze, nie ciężko."
 **Mission: AI-possible!**
