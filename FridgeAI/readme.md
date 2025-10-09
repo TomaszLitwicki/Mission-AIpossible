@@ -1,6 +1,6 @@
-# FridgeAI — asystent gotowania (MVP)
+# Fridge & Recipe AI — asystent gotowania (MVP)
 
-Prosta aplikacja webowa w **Python + Streamlit** korzystająca z **LLM**, która proponuje 3 przepisy na podstawie zawartości lodówki (CSV), pozwala wybrać przepis i po ugotowaniu odejmuje zużyte składniki z pliku `fridge.csv`.
+Prosta aplikacja webowa w **Python + Streamlit** korzystająca z **LLM**, która proponuje 3 przepisy na podstawie zawartości lodówki (CSV), pozwala wybrać przepis i po ugotowaniu odejmuje zużyte składniki z pliku `fridge.csv`. Jeśli nie ma możliwości połączenia się LLM zostanie wygenerowany sztuczny quasi przepis z istniejących produktów w formie testu - Dummy Recipes.
 
 ---
 
@@ -66,7 +66,7 @@ pip install -r requirements.txt
    ```env
    OPENAI_API_KEY=sk-twoj_klucz_api_tutaj
    ```
-   > Jeśli zostawisz pustą wartość, przy uruchamianiu aplikacja zgłosi błąd braku klucza.
+   > Jeśli zostawisz pustą wartość, aplikacja się nie połączy z LLM, więc zostanie wygenerowany sztuczny przepis testowy z istniejących składnikó - dummy recipes.
 
 > **Uwaga:** plik `.env` jest ignorowany przez Git (`.gitignore`). Nie commituj prawdziwych kluczy do repozytorium.
 
