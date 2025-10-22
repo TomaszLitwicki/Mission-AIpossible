@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horse Owner - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --stable-green: #5E7B5B;
+            --hay-beige: #E9DFC8;
+            --saddle-brown: #6B4E3D;
+            --field-gray: #5A5F63;
+            --fence-light: #F7F7F7;
+            --alert-red: #C0392B;
+            --soon-yellow: #F1C40F;
+            --okay-green: #27AE60;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fence-light);
+            color: var(--field-gray);
+            line-height: 1.5;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Merriweather', serif;
+            font-weight: 600;
+            color: var(--saddle-brown);
+        }
+
+        h1 { font-size: 28px; }
+        h2 { font-size: 22px; margin-bottom: 20px; }
+        h3 { font-size: 18px; }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--stable-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--field-gray);
+            font-weight: 500;
+            padding-bottom: 4px;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--stable-green);
+            border-bottom: 2px solid var(--stable-green);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 16px;
+        }
+
+        .welcome {
+            background: linear-gradient(135deg, var(--stable-green), #4a6248);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--stable-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4a6248;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--stable-green);
+            border: 2px solid var(--stable-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hay-beige);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .horse-card {
+            text-align: center;
+        }
+
+        .horse-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--hay-beige);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .horse-name {
+            margin-bottom: 8px;
+        }
+
+        .horse-info {
+            color: var(--field-gray);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: var(--hay-beige);
+            color: var(--saddle-brown);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        tr:hover {
+            background: var(--fence-light);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .pill-ok {
+            background: #d4edda;
+            color: var(--okay-green);
+        }
+
+        .pill-soon {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .pill-late {
+            background: #f8d7da;
+            color: var(--alert-red);
+        }
+
+        .ai-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 32px;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                🐴 Horse Owner
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#">Konie</a></li>
+                <li><a href="#">Treningi</a></li>
+                <li><a href="#">Opieka</a></li>
+                <li><a href="#">Kontakty</a></li>
+                <li><a href="#">AI Asystent</a></li>
+            </ul>
+            <div>Konto ▼</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome">
+            <h1>Dzień dobry, Tomasz! 👋</h1>
+            <p style="margin-top: 8px;">Witaj z powrotem w Horse Owner</p>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>🐴 Twoje konie</h2>
+                <a href="#" class="btn btn-secondary">Zobacz wszystkie</a>
+            </div>
+            <div class="card-grid">
+                <div class="card horse-card">
+                    <div class="horse-avatar">🐴</div>
+                    <h3 class="horse-name">Mira</h3>
+                    <div class="horse-info">
+                        Rasa: SP<br>
+                        Wiek: 12 lat
+                    </div>
+                    <a href="#" class="btn btn-primary">Profil konia →</a>
+                </div>
+                <div class="card horse-card">
+                    <div class="horse-avatar">🐎</div>
+                    <h3 class="horse-name">Wiosenka</h3>
+                    <div class="horse-info">
+                        Rasa: Huculski<br>
+                        Wiek: 7 lat
+                    </div>
+                    <a href="#" class="btn btn-primary">Profil konia →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>🏋️ Ostatnie treningi</h2>
+                <div style="display: flex; gap: 12px;">
+                    <a href="#" class="btn btn-primary">Dodaj trening</a>
+                    <a href="#" class="btn btn-secondary">Analiza tygodnia AI</a>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Koń</th>
+                        <th>Typ</th>
+                        <th>Czas</th>
+                        <th>Ocena (RPE)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-10-19</td>
+                        <td>Mira</td>
+                        <td>Teren</td>
+                        <td>70 min</td>
+                        <td>5/10</td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-18</td>
+                        <td>Mira</td>
+                        <td>Ujeżdżenie</td>
+                        <td>45 min</td>
+                        <td>6/10</td>
+                    </tr>
+                    <tr>
+                        <td>2025-10-16</td>
+                        <td>Wiosenka</td>
+                        <td>Skoki</td>
+                        <td>60 min</td>
+                        <td>7/10</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>💉 Nadchodzące zabiegi</h2>
+                <a href="#" class="btn btn-secondary">Zobacz wszystkie</a>
+            </div>
+            <div class="card">
+                <table style="box-shadow: none;">
+                    <tbody>
+                        <tr>
+                            <td><strong>Szczepienie</strong> – Mira</td>
+                            <td>2025-11-05</td>
+                            <td><span class="pill pill-soon">🟡 Nadchodzi</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Werkowanie</strong> – Wiosenka</td>
+                            <td>2025-10-25</td>
+                            <td><span class="pill pill-late">🔴 Po terminie</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Odrobaczenie</strong> – Mira</td>
+                            <td>2025-12-15</td>
+                            <td><span class="pill pill-ok">🟢 W terminie</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ai-box">
+            <h2 style="color: white; margin-bottom: 8px;">🧠 Szybki AI Asystent</h2>
+            <p>Zadaj pytanie dotyczące treningu, opieki lub żywienia</p>
+            <input type="text" class="ai-input" placeholder="Np. Jak zaplanować trening na przyszły tydzień?">
+            <button class="btn btn-primary" style="margin-top: 16px;">Zapytaj AI</button>
+        </div>
+    </div>
+</body>
+</html>
