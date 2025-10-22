@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Dodaj planowany zabieg</h1>
+
+  {% if errors %}
+    <div class="mb-4" style="background:#FDEDEC;border:1px solid #C0392B;padding:8px;border-radius:8px;">
+      <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+
+  <form method="post">
+    <label for="horse_id">Koń</label>
+    <select id="horse_id" name="horse_id" required>
+      <option value="">— wybierz —</option>
+      {% for h in horses %}
+        <option value="{{ h['id'] }}">{{ h['name'] }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="name">Zabieg</label>
+    <input id="name" name="name" type="text" required placeholder="np. Werkowanie">
+
+    <label for="date">Data</label>
+    <input id="date" name="date" type="date" required>
+
+    <label for="notes">Notatki (opcjonalnie)</label>
+    <textarea id="notes" name="notes" rows="3"></textarea>
+
+    <div class="mb-4" style="margin-top:12px;">
+      <button class="btn btn-primary" type="submit">Zapisz</button>
+      <a class="btn" href="/treatments">Anuluj</a>
+    </div>
+  </form>
+{% endblock %}

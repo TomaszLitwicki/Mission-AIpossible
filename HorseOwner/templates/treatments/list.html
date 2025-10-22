@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Zabiegi</h1>
+  <div class="mb-4">
+    <a class="btn btn-primary" href="/treatments/new">+ Dodaj planowany</a>
+  </div>
+
+  {% if treatments %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th><th>Koń</th><th>Zabieg</th><th>Status</th><th>Notatki</th><th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for z in treatments %}
+          <tr class="{% if z['status']==0 and z['date'] < today %}overdue{% endif %}">
+            <td>{{ z['date'] }}</td>
+            <td>{{ z['horse_name'] }}</td>
+            <td>{{ z['name'] }}</td>
+            <td>{{ 'TAK' if z['status']==1 else 'NIE' }}</td>
+            <td>{{ z['notes'] or '—' }}</td>
+            <td>
+              <form method="post" action="/treatments/toggle/{{ z['id'] }}" style="display:inline">
+                <label style="cursor:pointer">
+                  <input type="checkbox" name="done" onchange="this.form.submit()" {% if z['status']==1 %}checked{% endif %}>
+                  wykonano
+                </label>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Brak wpisów zabiegów.</p>
+  {% endif %}
+{% endblock %}

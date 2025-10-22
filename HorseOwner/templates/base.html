@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <title>Horse Owner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/main.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="container">
+      <strong>Horse Owner</strong>
+      <span class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/horses">Konie</a>
+        <a href="/trainings">Treningi</a>
+        <a href="/treatments">Zabiegi</a>
+      </span>
+    </div>
+  </nav>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

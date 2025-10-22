@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Dodaj trening</h1>
+
+  {% if errors %}
+    <div class="mb-4" style="background:#FDEDEC;border:1px solid #C0392B;padding:8px;border-radius:8px;">
+      <ul>
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post">
+    <label for="horse_id">Koń</label>
+    <select id="horse_id" name="horse_id" required>
+      <option value="">— wybierz —</option>
+      {% for h in horses %}
+        <option value="{{ h['id'] }}"
+          {% if form and form.get('horse_id')|int == h['id'] %}selected{% endif %}>
+          {{ h['name'] }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="date">Data</label>
+    <input id="date" name="date" type="date" value="{{ form.get('date','') if form else '' }}" required>
+
+    <label for="time">Godzina (opcjonalnie)</label>
+    <input id="time" name="time" type="time" value="{{ form.get('time','') if form else '' }}">
+
+    <label for="duration_min">Czas trwania (min)</label>
+    <input id="duration_min" name="duration_min" type="number" min="1" value="{{ form.get('duration_min','') if form else '' }}" required>
+
+    <label for="type">Typ</label>
+    <select id="type" name="type" required>
+      {% for key, val in labels.items() %}
+        <option value="{{ key }}" {% if form and form.get('type')==key %}selected{% endif %}>{{ val }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="score">Ocena 1–10 (opcjonalnie)</label>
+    <input id="score" name="score" type="number" min="1" max="10" value="{{ form.get('score','') if form else '' }}">
+
+    <label for="satisfied">Zadowolenie</label>
+    <select id="satisfied" name="satisfied" required>
+      <option value="">— wybierz —</option>
+      <option value="1" {% if form and form.get('satisfied')=='1' %}selected{% endif %}>TAK</option>
+      <option value="0" {% if form and form.get('satisfied')=='0' %}selected{% endif %}>NIE</option>
+    </select>
+
+    <label for="notes">Notatki</label>
+    <textarea id="notes" name="notes" rows="3">{{ form.get('notes','') if form else '' }}</textarea>
+
+    <div class="mb-4" style="margin-top:12px;">
+      <button class="btn btn-primary" type="submit">Zapisz</button>
+      <a class="btn" href="{{ url_for('trainings_list') }}">Anuluj</a>
+    </div>
+  </form>
+{% endblock %}

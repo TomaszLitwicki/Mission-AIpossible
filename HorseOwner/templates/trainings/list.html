@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Treningi</h1>
+
+  <form method="get" class="mb-4">
+    <label for="horse_id">Koń</label>
+    <select id="horse_id" name="horse_id">
+      <option value="">— wszyscy —</option>
+      {% for h in horses %}
+        <option value="{{ h['id'] }}"
+          {% if current_filters.horse_id == h['id'] %}selected{% endif %}>
+          {{ h['name'] }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="period">Okres</label>
+    <select id="period" name="period">
+      <option value="">— bez —</option>
+      <option value="week"  {% if current_filters.period == 'week' %}selected{% endif %}>Ostatni tydzień</option>
+      <option value="month" {% if current_filters.period == 'month' %}selected{% endif %}>Ostatni miesiąc</option>
+    </select>
+
+    <label for="satisfied">Zadowolenie</label>
+    <select id="satisfied" name="satisfied">
+      <option value="">— bez —</option>
+      <option value="1" {% if current_filters.satisfied == '1' %}selected{% endif %}>TAK</option>
+      <option value="0" {% if current_filters.satisfied == '0' %}selected{% endif %}>NIE</option>
+    </select>
+
+    <button class="btn btn-primary" type="submit">Filtruj</button>
+    <a class="btn" href="{{ url_for('trainings_list') }}">Wyczyść</a>
+    <a class="btn btn-primary" href="{{ url_for('trainings_new') }}" style="float:right">+ Dodaj trening</a>
+  </form>
+
+  {% if trainings %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Koń</th>
+          <th>Typ</th>
+          <th>Czas</th>
+          <th>Ocena</th>
+          <th>😊</th>
+          <th>Notatki</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in trainings %}
+          <tr>
+            <td>{{ t['date'] }}{% if t['time'] %} {{ t['time'] }}{% endif %}</td>
+            <td>{{ t['horse_name'] }}</td>
+            <td>{{ labels.get(t['type'], t['type']) }}</td>
+            <td>{{ t['duration_min'] }} min</td>
+            <td>{% if t['score'] is not none %}{{ t['score'] }}/10{% else %}—{% endif %}</td>
+            <td>{{ 'TAK' if t['satisfied'] == 1 else 'NIE' }}</td>
+            <td>{{ t['notes'] or '—' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Brak wpisów dla wybranych filtrów.</p>
+  {% endif %}
+{% endblock %}

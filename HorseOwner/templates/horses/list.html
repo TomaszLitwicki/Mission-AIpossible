@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Twoje konie</h1>
+  {% if horses %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Imię</th><th>Rasa</th><th>Płeć</th><th>Data ur.</th><th>Maść</th><th>Pochodzenie</th><th>Notatki</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for h in horses %}
+        <tr>
+          <td>{{ h["name"] }}</td>
+          <td>{{ h["breed"] or "-" }}</td>
+          <td>{{ h["sex"] or "-" }}</td>
+          <td>{{ h["birth_date"] or "-" }}</td>
+          <td>{{ h["color"] or "-" }}</td>
+          <td>{{ h["origin"] or "-" }}</td>
+          <td>{{ h["notes"] or "-" }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Brak koni. Uruchom <code>flask --app app seed-db</code> lub dodaj dane ręcznie.</p>
+  {% endif %}
+{% endblock %}

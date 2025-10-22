@@ -1,0 +1,78 @@
+:root{
+  --green:#5E7B5B; --text:#5A5F63; --bg:#F7F7F7; --card:#FFFFFF; --border:#E5E7EB;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Roboto,Arial}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.topbar{background:#fff;border-bottom:1px solid var(--border)}
+.topbar .nav-links a{margin-left:12px;color:var(--green);text-decoration:none}
+h1{font-size:28px;margin:16px 0}
+.table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border)}
+.table th,.table td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+.table thead th{background:#FAFAFA}
+.table tr.overdue { background: #FDEDEC; } /* subtelny czerwony */
+
+
+/* === Dashboard: cards === */
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card-emoji {
+  display: grid;
+  place-items: center;
+  font-size: 56px;
+  line-height: 1;
+  height: 160px;
+  background: var(--panel, #f7f7f7);
+}
+.card-body { padding: 12px 14px; }
+.card-title { margin: 0 0 4px; font-size: 18px; color: var(--text, #111827); }
+.card-meta { margin: 0 0 8px; color: #6b7280; font-size: 14px; }
+.card-note { margin: 0 0 10px; font-size: 14px; color: var(--text, #111827); }
+
+.btn {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid var(--green, #5E7B5B);
+}
+.btn-primary { background: var(--green, #5E7B5B); color: #fff; }
+.btn-primary:hover { filter: brightness(0.95); }
+.mb-4 { margin-bottom: 24px; }
+textarea.form-control {
+  width: 100%;
+}
+
+/* === Spójne nagłówki kart z emotikoną === */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FAFAFA;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text);
+  padding: 10px 14px;
+}
+
+.card-header .icon {
+  font-size: 22px;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 28px; height: 28px;
+}
+
+/* Opcjonalnie: ujednolicone odstępy między sekcjami */
+.section { margin-bottom: 24px; }
