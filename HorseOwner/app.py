@@ -6,6 +6,13 @@ from flask import request, redirect, url_for, flash
 
 from datetime import date
 
+from openai import OpenAI
+
+from dotenv import load_dotenv
+
+load_dotenv()
+client = OpenAI()
+
 TRAINING_LABELS = {
     'dressage': 'Ujeżdżenie',
     'jumping': 'Skoki',
@@ -41,8 +48,63 @@ def get_db():
 def inject_today():
     return {"today": date.today().isoformat()}
 
-#--- Feature 3 ---
 
+#--- Feature 4 ---
+
+def _fetch_horse(db, horse_id):
+    return db.execute("SELECT * FROM horses WHERE id = ?", (horse_id,)).fetchone()
+
+def _fetch_trainings(db, horse_id, limit=12):
+    return db.execute("""
+        SELECT date, time, duration_min, type, score, satisfied, notes
+        FROM trainings
+        WHERE horse_id = ?
+        ORDER BY date DESC, time DESC
+        LIMIT ?
+    """, (horse_id, limit)).fetchall()
+
+def _format_trainings_for_prompt(rows):
+    lines = ["date,time,duration_min,type,score,satisfied,notes"]
+    for r in rows:
+        notes = (r["notes"] or "").replace("\n", " ").replace(",", ";")
+        sat = "TAK" if r["satisfied"] else "NIE"
+        lines.append(f"{r['date']},{r['time']},{r['duration_min']},{r['type']},{r['score']},{sat},{notes}")
+    return "\n".join(lines)
+
+def _call_llm(horse, trainings_csv, user_msg):
+    if not os.getenv("OPENAI_API_KEY"):
+        return "Brak klucza OPENAI_API_KEY — skonfiguruj środowisko i spróbuj ponownie."
+
+    system_prompt = (
+        "Jesteś asystentem treningowym koni. Analizujesz dane treningowe i opis użytkownika. "
+        "Udzielasz praktycznych, konkretnych wskazówek treningowych. "
+        "Nie udzielasz porad medycznych ani diagnostycznych. "
+        "Format odpowiedzi: 3–6 punktów, krótko i rzeczowo po polsku."
+    )
+
+    user_block = (
+        f"KOŃ: {horse.get('name','?')} (płeć: {horse.get('sex','?')}, rasa: {horse.get('breed','?')}, maść: {horse.get('color','?')})\n"
+        f"OPIS UŻYTKOWNIKA:\n{user_msg}\n\n"
+        f"OSTATNIE TRENINGI (CSV):\n{trainings_csv}\n"
+    )
+
+    try:
+        response = client.responses.create(
+            model="gpt-5-nano",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_block}
+            ]
+        )
+
+        text = (response.output_text or "").strip()
+        return text or "Model zwrócił pustą odpowiedź."
+    except Exception as e:
+        print("LLM ERROR:", repr(e))
+        return f"Błąd wywołania LLM: {e}"
+
+
+#--- Feature 3 ---
 @app.route("/horses/<int:horse_id>")
 def horse_detail(horse_id):
     db = get_db()
@@ -90,15 +152,47 @@ def horse_detail(horse_id):
 
 @app.route("/horses/<int:horse_id>/ai", methods=["POST"])
 def horse_ai(horse_id):
-    # Na razie: zbieramy tekst i wracamy na stronę z placeholderem odpowiedzi.
     user_msg = (request.form.get("user_msg") or "").strip()
-    ai_reply = "(tu w następnym etapie wstawimy prawdziwą odpowiedź LLM)"
-    return redirect(url_for(
-        "horse_detail",
-        horse_id=horse_id,
+
+    db = get_db()
+    horse = db.execute("SELECT * FROM horses WHERE id = ?", (horse_id,)).fetchone()
+    if not horse:
+        flash("Koń nie istnieje.", "error")
+        return redirect(url_for("index"))
+
+    trainings = db.execute("""
+        SELECT date, time, duration_min, type, score, satisfied, notes
+        FROM trainings
+        WHERE horse_id = ?
+        ORDER BY date DESC, time DESC
+        LIMIT 12
+    """, (horse_id,)).fetchall()
+
+    treatments = db.execute("""
+        SELECT date, name, status, notes
+        FROM treatments
+        WHERE horse_id = ?
+        ORDER BY date DESC
+    """, (horse_id,)).fetchall()
+
+    ai_reply = "(podaj krótki cel/problem powyżej)"
+    if user_msg:
+        trainings_csv = _format_trainings_for_prompt(trainings)
+        horse_dict = dict(horse)
+        ai_reply = _call_llm(horse_dict, trainings_csv, user_msg)
+
+    return render_template(
+        "horses/detail.html",
+        horse_dict=dict(horse),
+        trainings=trainings,
+        treatments=treatments,
+        HORSE_FIELDS_ORDER=HORSE_FIELDS_ORDER,
+        HORSE_LABELS=HORSE_LABELS,
+        TRAINING_LABELS=TRAINING_LABELS,
         ai_user_msg=user_msg,
         ai_reply=ai_reply
-    ))
+    )
+
 
 #--- Feature 2 ---
 @app.route("/treatments")
@@ -113,10 +207,10 @@ def treatments_list():
     """).fetchall()
     return render_template("treatments/list.html", treatments=rows)
 
+
 @app.route("/treatments/toggle/<int:tr_id>", methods=["POST"])
 def treatments_toggle(tr_id):
     db = get_db()
-    # flip 0 -> 1, 1 -> 0
     db.execute("""
         UPDATE treatments
         SET status = CASE status WHEN 1 THEN 0 ELSE 1 END
@@ -124,6 +218,7 @@ def treatments_toggle(tr_id):
     """, (tr_id,))
     db.commit()
     return redirect("/treatments")
+
 
 @app.route("/treatments/new", methods=["GET","POST"])
 def treatments_new():
@@ -226,7 +321,6 @@ def trainings_new():
         satisfied = request.form.get("satisfied", type=int)  # 0/1
         notes = request.form.get("notes", type=str)
 
-        # Minimalna walidacja
         errors = []
         if not horse_id:
             errors.append("Wybierz konia.")
@@ -242,7 +336,6 @@ def trainings_new():
             errors.append("Ocena (score) musi być w zakresie 1–10 albo pusta.")
 
         if errors:
-            # Prosta informacja – w MVP można wyświetlić w szablonie
             return render_template(
                 "trainings/new.html",
                 errors=errors,
@@ -267,7 +360,6 @@ def trainings_new():
 
         return redirect(url_for("trainings_list"))
 
-    # GET – formularz
     horses = db.execute("SELECT id, name FROM horses ORDER BY name").fetchall()
     return render_template("trainings/new.html", horses=horses, labels=TRAINING_LABELS)
 
